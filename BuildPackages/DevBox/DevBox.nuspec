@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>DevBox</id>
+    <version>1.0.0</version>
+    <authors>Kris</authors>
+    <owners>Kris</owners>
+    <description>Package description</description>
+    <tags>Boxstarter</tags>
+  </metadata>
+</package>

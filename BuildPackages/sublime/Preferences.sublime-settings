@@ -1,0 +1,10 @@
+{
+	"color_scheme": "Packages/User/Espresso Soda.tmTheme",
+	"font_face": "Source Code Pro",
+	"font_size": 11,
+	"theme": "Soda Light.sublime-theme",
+	"ignored_packages":
+	[
+		"Vintage"
+	]
+}
