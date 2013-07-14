@@ -9,23 +9,25 @@ try {
     #     if(Test-PendingReboot){Invoke-Reboot}
     #     cinstm Dogtail.VS2012.2
     # }
-    # cinstm fiddler
+    cinstm fiddler4
     # cinstm mssqlserver2012express
     # cinstm git-credential-winstore
-    # cinstm githubforwindows
-    # cinstm ConsoleZ
+    cinstm githubforwindows
+    cinstm ConsoleZ
     cinstm sublimetext2
     cinstm SublimeText2.PackageControl
     # cinstm SublimeText2.PowershellAlias
     # cinstm poshgit
-    cinstm dotpeek
+    # cinstm dotpeek
     # cinstm googlechrome
     # cinstm Paint.net
     # cinstm windirstat
-    cinstm resharper
+    # cinstm resharper
     cinstm SourceCodePro
     cinstm MesloLG.DZ
-    cinstm dejavu.fonts
+    cinstm dejavu.font
+    
+    cinst git_reflow -source ruby
 
     # cinst IIS-WebServerRole -source windowsfeatures
     # cinst IIS-HttpCompressionDynamic -source windowsfeatures
