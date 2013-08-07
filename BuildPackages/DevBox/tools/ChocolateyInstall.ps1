@@ -3,64 +3,104 @@ try {
     Update-ExecutionPolicy Unrestricted
     Set-ExplorerOptions -showHidenFilesFoldersDrives -showFileExtensions
     & powercfg.exe -h off # Turn off Hibernation
+    Disable-LockScreen
 
-    # cinstm VisualStudio2012Ultimate
-    # if((Get-Item "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe").VersionInfo.ProductVersion -lt "11.0.60115.1") {
-    #     if(Test-PendingReboot){Invoke-Reboot}
-    #     cinstm Dogtail.VS2012.2
-    # }
-    # cinstm fiddler
-    # cinstm mssqlserver2012express
+    # # cinstm VisualStudio2012Ultimate
+    # # if((Get-Item "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe").VersionInfo.ProductVersion -lt "11.0.60115.1") 
+    # # {
+    # #     if(Test-PendingReboot){Invoke-Reboot}
+    # #     cinstm Dogtail.VS2012.2
+    # # }
     # cinstm git-credential-winstore
     # cinstm githubforwindows
-    # cinstm ConsoleZ
-    cinstm sublimetext2
-    cinstm SublimeText2.PackageControl
-    # cinstm SublimeText2.PowershellAlias
-    # cinstm poshgit
-    cinstm dotpeek
+    # cinstm Console2
+    # cinstm sublimetext2
+    # cinstm SublimeText2.PackageControl
+    cinstm PsGet
+    # cinstm dotpeek
     # cinstm googlechrome
-    # cinstm Paint.net
-    # cinstm windirstat
-    cinstm resharper
-    cinstm SourceCodePro
-    cinstm MesloLG.DZ
-    cinstm dejavu.fonts
+    # # cinstm resharper
+    # cinstm SourceCodePro
+    # cinstm MesloLG.DZ
+    # cinstm dejavu.fonts
 
-    # cinst IIS-WebServerRole -source windowsfeatures
-    # cinst IIS-HttpCompressionDynamic -source windowsfeatures
-    # cinst IIS-ManagementScriptingTools -source windowsfeatures
-    # cinst IIS-WindowsAuthentication -source windowsfeatures
+    # Write-Host "Importing PsGet"
+    # Import-Module "$env:programfiles\Common Files\Modules\PsGet\PsGet.psm1"
+    # Write-Host "Installing Posh-Git"
+    # Install-Module Posh-Git
+    # Write-Host "Posh-Git installed!"
 
-    $sublimeDir = "$env:programfiles\Sublime Text 2"
-    $sublimeUserDir = "$env:APPDATA\Roaming\Sublime Text 2"
+    # $sublimeDir = "$env:programfiles\Sublime Text 2"
 
-    & git clone "https://github.com/buymeasoda/soda-theme/" "$sublimeUserDir\Theme - Soda"
+    # # Need to make sure the appdata path exists, and if not create it.
+    # $sublimeUserDir = "$env:APPDATA\Sublime Text 2"
+    # if(!(Test-Path $sublimeUserDir))
+    # {
+    #     New-Item "$sublimeUserDir\Packages\User" -type Directory
+    # }
+    # & git clone "https://github.com/buymeasoda/soda-theme/" "$sublimeUserDir\Packages\Theme - Soda"
+    # # Currently erroring here.
+    # Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'sublime\*.tmTheme') -Force -Recurse "$sublimeUserDir\Packages\User"
+    # Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'sublime\*.sublime-settings') -Force -Recurse "$sublimeUserDir\Packages\User"
 
-    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'sublime\*.tmTheme') -Force -Recurse "$sublimeUserDir\Packages\User"
-    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'sublime\*.sublime-settings') -Force -Recurse "$sublimeUserDir\Packages\User"
+    # $powerShellUserDir = "$($env:USERPROFILE)\Documents\WindowsPowerShell"
+    # if(!(Test-Path $powerShellUserDir))
+    # {
+    #     Write-Host "Creating $powerShellUserDir..."
+    #     New-Item "$powerShellUserDir" -type Directory -Force
+    # }
+    # Write-Host "Copying Microsoft.PowerShell_profile.ps1 to $powerShellUserDir"
+    # Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'Microsoft.PowerShell_profile.ps1') -Force -Recurse "$powerShellUserDir"
 
-    Install-ChocolateyPinnedTaskBarItem "$sublimeDir\sublime_text.exe"
-    Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Google\Chrome\Application\chrome.exe"
-    Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
+    # Install-ChocolateyPinnedTaskBarItem "$sublimeDir\sublime_text.exe"
+    # # Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Google\Chrome\Application\chrome.exe"
+    # Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
 
-    Install-ChocolateyFileAssociation ".txt" "$env:programfiles\Sublime Text 2\sublime_text.exe"
-    Install-ChocolateyFileAssociation ".ps1" "$env:programfiles\Sublime Text 2\sublime_text.exe"
-    Install-ChocolateyFileAssociation ".cs" "$env:programfiles\Sublime Text 2\sublime_text.exe"
-    Install-ChocolateyFileAssociation ".cshtml" "$env:programfiles\Sublime Text 2\sublime_text.exe"
-    Install-ChocolateyFileAssociation ".csproj" "$env:programfiles\Sublime Text 2\sublime_text.exe"
-    Install-ChocolateyFileAssociation ".js" "$env:programfiles\Sublime Text 2\sublime_text.exe"
-    Install-ChocolateyFileAssociation ".css" "$env:programfiles\Sublime Text 2\sublime_text.exe"
-    Install-ChocolateyFileAssociation ".less" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".txt" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".ps1" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".cs" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".cshtml" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".csproj" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".js" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".css" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".less" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    # Install-ChocolateyFileAssociation ".config" "$env:programfiles\Sublime Text 2\sublime_text.exe"
 
-    # if(!(Test-Path("$sublimeDir\data")){mkdir "$sublimeDir\data"}
-    # copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'sublime\*') -Force -Recurse "$sublimeDir\data"
-    # move-item "$sublimeDir\data\Pristine Packages\*" -Force "$sublimeDir\Pristine Packages"
-    # copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'console.xml') -Force $env:appdata\console\console.xml
+    # if(!(where.exe git))
+    # {
+    #     #Why is git not on the PATH?
 
-    # Install-ChocolateyVsixPackage xunit http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix
-    # Install-ChocolateyVsixPackage autowrocktestable http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix
-    # Install-ChocolateyVsixPackage vscommands http://visualstudiogallery.msdn.microsoft.com/a83505c6-77b3-44a6-b53b-73d77cba84c8/file/74740/18/SquaredInfinity.VSCommands.VS11.vsix
+    #     $gitPath = 'C:\Program Files\git\bin'
+    #     if(!(test-path $gitPath))
+    #     {
+    #         $gitPath = 'C:\Program Files (x86)\Git\bin'
+    #     }
+
+    #     if(test-path "$gitPath\git.exe")
+    #     {
+    #         $env:Path += ";$gitPath"
+    #     }
+    #     else
+    #     {
+    #         throw "could not find git, rest of setup not going to execute..."
+    #         return;
+    #     }
+    # }
+
+    # git config --global user.email kmcginnes@me.com
+    # git config --global user.name 'Kris McGinnes'
+    # git config --global color.status.changed "cyan normal bold" 
+    # git config --global color.status.untracked "cyan normal bold"
+
+    # # configure git diff and merge if p4merge was installed
+    # if(where.exe p4merge) {
+    #     git config --global merge.tool p4merge
+    #     git config --global mergetool.p4merge.cmd 'p4merge.exe \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"'
+    #     git config --global mergetool.prompt false
+
+    #     git config --global diff.tool p4merge
+    #     git config --global difftool.p4merge.cmd 'p4merge.exe \"$LOCAL\" \"$REMOTE\"'
+    # }
 
     Write-ChocolateySuccess 'DevBox'
 } catch {

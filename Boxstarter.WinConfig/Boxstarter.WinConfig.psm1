@@ -12,4 +12,5 @@ Export-ModuleMember Disable-UAC, `
                     Enable-RemoteDesktop, `
                     Set-ExplorerOptions, `
                     Get-LibraryNames, `
-                    Update-ExecutionPolicy
+                    Update-ExecutionPolicy, `
+                    Disable-LockScreen
