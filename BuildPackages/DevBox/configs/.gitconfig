@@ -1,0 +1,101 @@
+[core]
+	autocrlf = false
+	excludesfile = ~/.gitignore_global
+[credential]
+[user]
+	email = kmcginnes@me.com
+	name = Kris McGinnes
+[diff]
+	tool = bc3
+[difftool "bc3"]
+	path = c:/program files (x86)/beyond compare 3/bcomp.exe
+[difftool]
+	prompt = false
+[merge]
+	tool = bc3
+[mergetool "bc3"]
+	path = c:/program files (x86)/beyond compare 3/bcomp.exe
+	trustExitCode = true
+[mergetool]
+	prompt = false
+[alias]
+	# Snagged from Ryan Tomayko (http://github.com/rtomayko/dotfiles)
+	# commit
+	ci = commit --verbose
+	cn = commit --verbose --amend
+	ca = commit --verbose --all
+	cw = commit -m "WIP"
+	cm = commit -m
+	cc = commit -c
+	
+	# branch
+	b = branch
+	
+	# add
+	a = add
+	aa = add --update
+	ap = add --patch
+	
+	# checkout
+	co = checkout
+	cob = checkout -b
+	
+	# fetch
+	f = fetch
+	fo = fetch origin
+
+	# merge
+	m = merge
+	
+	# pull
+	pr = pull --rebase
+
+	#push
+	pgm = push github master
+	pom = push origin master
+
+	# rebase
+	r  = rebase
+	rm = rebase master
+	rom = rebase origin/master
+	ri = rebase --interactive HEAD~10
+	rc = rebase --continue
+	ra = rebase --abort
+	
+	# diff
+	d = diff
+	p = diff --cached # mnemonic: "patch"
+	ds = diff --stat # mnemonic: "diff stat"
+	dt = difftool --no-prompt
+	
+	# status
+	s = status 
+	sp = -p status # with pagination
+	ss = -p status -s
+	
+	# log
+	l = log --pretty=oneline --abbrev-commit
+	ll = log --pretty=oneline --abbrev-commit --max-count=15
+	lc = log --stat --summary
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	lga = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative --all
+	
+	# clean
+	prune = fetch --prune
+
+	# tfs
+	tpush = tfs checkintool
+	tpull = tfs pull
+
+	# misc
+	pi = cherry-pick
+	ki = stash --keep-index
+
+	# experimental
+	unstage = reset HEAD
+  	uncommit = reset --soft HEAD^
+	stage = add
+	pop = reset --soft HEAD^
+	review = log -p --max-count=1
+	rv = remote -v
+	fp = format-patch --stdout
