@@ -1,17 +1,25 @@
 try {
-    Install-WindowsUpdate -AcceptEula
+    Disable-UAC
     Update-ExecutionPolicy Unrestricted
-    Set-ExplorerOptions -showHidenFilesFoldersDrives -showFileExtensions
+    Set-ExplorerOptions -showHidenFilesFoldersDrives -showFileExtensions -bootToDesktop -hideTouchKeyboard
+
+    Write-BoxstarterMessage "Turning off the lock screen"
+    $key = 'HKLM:\Software\Policies\Microsoft\Windows\Personalization'
+    if(!(Test-Path $key))
+    {
+        New-Item -Path $key -Force | Out-Null
+        New-ItemProperty -Path $key -Name NoLockScreen -Value 1 -Type DWord | Out-Null
+    }
+    else
+    {
+        Set-ItemProperty $key NoLockScreen 1 -Type DWord
+    }
     
-    write-BoxstarterMessage "Turning off Windows Hibernation"
+    Write-BoxstarterMessage "Turning off Windows Hibernation"
     & powercfg.exe -h off
+    Write-BoxstarterMessage "Setting time zone to Central Standard Time"
     & $env:windir\system32\tzutil /s "Central Standard Time"
 
-    # cinstm VisualStudio2012Ultimate
-    # if((Get-Item "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe").VersionInfo.ProductVersion -lt "11.0.60115.1") {
-    #     if(Test-PendingReboot){Invoke-Reboot}
-    #     cinstm Dogtail.VS2012.2
-    # }
     cinstm 7zip
     cinstm fiddler4
     cinstm git-credential-winstore
@@ -19,12 +27,11 @@ try {
     cinstm Console2
     cinstm sublimetext2
     cinstm SublimeText2.PackageControl
-    # cinstm dotpeek
     cinstm googlechrome
     cinstm windirstat
-    # cinstm resharper
     cinstm SourceCodePro
     cinstm PsGet
+    cinstm procmon
 
     # cinst IIS-WebServerRole -source windowsfeatures
     # cinst IIS-HttpCompressionDynamic -source windowsfeatures
@@ -37,33 +44,34 @@ try {
     $sublimePackagesDir = "$env:APPDATA\Sublime Text 2\Packages"
 
     if(!(Test-Path "$sublimePackagesDir\Theme - Soda")) {
-        write-BoxstarterMessage "Cloning the Sublime Text theme Soda"
+        Write-BoxstarterMessage "Cloning the Sublime Text theme Soda"
+        New-Item -ItemType Directory -Path "$sublimePackagesDir\Theme - Soda" -Force | Out-Null
         & git clone "https://github.com/buymeasoda/soda-theme/" "$sublimePackagesDir\Theme - Soda"
     }
 
-    write-BoxstarterMessage "Copying personal Sublime Text settings"
-    New-Item -ItemType Directory -Path "$sublimePackagesDir\User" -Force
-    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\sublime\*') -Force -Recurse "$sublimePackagesDir\User"
+    Write-BoxstarterMessage "Copying personal Sublime Text settings"
+    New-Item -ItemType Directory -Path "$sublimePackagesDir\User" -Force | Out-Null
+    Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\sublime\*') -Force -Recurse "$sublimePackagesDir\User"
 
-    write-BoxstarterMessage "Copying personal global gitignore and gitconfig"
-    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitignore_global') -Force -Recurse "$env:userprofile\.gitignore_global"
-    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitconfig') -Force -Recurse "$env:userprofile\.gitconfig"
+    Write-BoxstarterMessage "Copying personal global gitignore and gitconfig"
+    Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitignore_global') -Force -Recurse "$env:userprofile\.gitignore_global"
+    Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitconfig') -Force -Recurse "$env:userprofile\.gitconfig"
 
-    write-BoxstarterMessage "Installing PoshGit and PowerShell settings..."
+    Write-BoxstarterMessage "Installing PoshGit and PowerShell settings..."
     $documentsDir = [environment]::getfolderpath("mydocuments")
-    New-Item -ItemType Directory -Path "c:\tools\poshgit" -Force
+    New-Item -ItemType Directory -Path "c:\tools\poshgit" -Force | Out-Null
     & git clone "https://github.com/dahlbyk/posh-git.git" "c:\tools\poshgit"
-    New-Item -ItemType Directory -Path "$documentsDir\WindowsPowerShell" -Force
-    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\Microsoft.PowerShell_profile.ps1') -Force -Recurse "$documentsDir\WindowsPowerShell"
+    New-Item -ItemType Directory -Path "$documentsDir\WindowsPowerShell" -Force | Out-Null
+    Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\Microsoft.PowerShell_profile.ps1') -Force -Recurse "$documentsDir\WindowsPowerShell"
 
     $console2Dir = Join-Path "$env:ChocolateyInstall\lib" (Get-ChildItem "$env:ChocolateyInstall\lib" | ?{$_.name -match "^console2\.\d+"})
-    write-BoxstarterMessage "Copying personal Console2 settings to $console2Dir\bin..."
-    copy-item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\console.xml') -Force -Recurse "$console2Dir\bin"
+    Write-BoxstarterMessage "Copying personal Console2 settings to $console2Dir\bin..."
+    Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\console.xml') -Force -Recurse "$console2Dir\bin"
 
-    write-BoxstarterMessage "Setting up pinned task bar items"
-    Install-ChocolateyPinnedTaskBarItem "$sublimeDir\sublime_text.exe"
+    Write-BoxstarterMessage "Setting up pinned task bar items"
     Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Google\Chrome\Application\chrome.exe"
-    # Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe"
+    Install-ChocolateyPinnedTaskBarItem "$console2Dir\bin\Console.exe"
+    Install-ChocolateyPinnedTaskBarItem "$sublimeDir\sublime_text.exe"
 
     Install-ChocolateyFileAssociation ".txt" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".log" "$env:programfiles\Sublime Text 2\sublime_text.exe"
@@ -76,6 +84,8 @@ try {
     Install-ChocolateyFileAssociation ".js" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".css" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".less" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+
+    Install-WindowsUpdate -AcceptEula
 
     Write-ChocolateySuccess 'DevBox'
 } catch {

@@ -18,6 +18,8 @@
 	trustExitCode = true
 [mergetool]
 	prompt = false
+[gc]
+	auto=1
 [alias]
 	# Snagged from Ryan Tomayko (http://github.com/rtomayko/dotfiles)
 	# commit
