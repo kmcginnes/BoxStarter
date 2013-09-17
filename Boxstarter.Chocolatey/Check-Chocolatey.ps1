@@ -3,9 +3,10 @@ function Check-Chocolatey ([switch]$ShouldIntercept){
         Write-BoxstarterMessage "Chocolatey not instaled. Boxstarter will download and install."
         $env:ChocolateyInstall = "$env:systemdrive\chocolatey"
         New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
-        $url=$Boxstarter.config.ChocolateyPackage
+        $config = Get-BoxstarterConfig
+        $url=$config.ChocolateyPackage
         Enter-BoxstarterLogable {
-            iex ((new-object net.webclient).DownloadString($Boxstarter.config.ChocolateyRepo))
+            iex ((new-object net.webclient).DownloadString($config.ChocolateyRepo))
             Import-Module $env:ChocolateyInstall\chocolateyinstall\helpers\chocolateyInstaller.psm1
             Enable-Net40
         }
@@ -22,7 +23,7 @@ function Enable-Net40 {
         $session=Start-TimedSection "Download and install .NET 4.0 Framework"
         $env:chocolateyPackageFolder="$env:temp\chocolatey\webcmd"
         Install-ChocolateyZipPackage 'webcmd' 'http://www.iis.net/community/files/webpi/webpicmdline_anycpu.zip' $env:temp
-        .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /accepteula
+        .$env:temp\WebpiCmdLine.exe /products: NetFramework4 /SuppressReboot /accepteula
         Stop-TimedSection $session
     }
 }

@@ -13,6 +13,10 @@ The string to be logged
 .PARAMETER NoLogo
 If ommited, the message will be preceeded with "Boxstarter: "
 
+.PARAMETER Color
+Specifies a foreground color to use for the message. Green is the 
+default.
+
 .EXAMPLE
 Write-BoxstarterMessage "I am logging a message."
 
@@ -32,10 +36,14 @@ http://boxstarter.codeplex.com
 about_boxstarter_logging
 
 #>
-    param([String]$message, [switch]$nologo)
+    param(
+        [String]$message, 
+        [switch]$nologo,
+        [ConsoleColor]$color=[ConsoleColor]::green
+    )
     if($Boxstarter.SuppressLogging){return}
     if(!$nologo){$message = "Boxstarter: $message"}
     $fmtTitle = Format-BoxStarterMessage $message
-    Write-Host $fmtTitle -ForeGroundColor green
+    Write-Host $fmtTitle -ForeGroundColor $color
     Log-BoxStarterMessage $fmtTitle
 }

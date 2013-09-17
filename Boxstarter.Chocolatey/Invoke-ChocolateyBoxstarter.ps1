@@ -1,12 +1,8 @@
-if($Boxstarter.Config.LocalRepo -ne $null){
-    $BoxStarter.LocalRepo=$Boxstarter.Config.LocalRepo
-} else {
-    if($Boxstarter.baseDir){
-        $Boxstarter.localRepo=(Join-Path $Boxstarter.baseDir BuildPackages)
-    }
-}
-$Boxstarter.NugetSources=$Boxstarter.Config.NugetSources
+$config = Get-BoxstarterConfig
+$BoxStarter.LocalRepo=$config.LocalRepo
+$Boxstarter.NugetSources=$config.NugetSources
 $Boxstarter.RebootOk=$true
+
 function Invoke-ChocolateyBoxstarter{
 <#
 .SYNOPSIS
@@ -38,10 +34,20 @@ This essentially wraps Chocolatey Install and provides these additional features
 This is the path to the local boxstarter repository where boxstarter 
 should look for .nupkg files to install. By default this is located 
 in the BuildPackages directory just under the root Boxstarter 
-directory.
+directory but can be changed with Set-BoxstarterConfig.
 
 .PARAMETER DisableReboots
-If set, reboots are subbressed.
+If set, reboots are suppressed.
+
+.PARAMETER Password
+User's password as a Secure string to be used for reboot autologons.
+This will suppress the password prompt at the beginning of the 
+Boxstarter installer.
+
+.PARAMETER NoNewWindow
+Enabling this switch will prevent the command window from closing and 
+prompt the user to pres the Enter key before the window closes. This 
+is ideal when not invoking boxstarter from a console.
 
 .EXAMPLE
 Invoke-ChocolateyBoxstarter example
@@ -59,35 +65,55 @@ reboot the macine if a pending reboot is needed. Boxstarter will look
 for the Win8Install .nupkg file in the \\serer\share\boxstarter 
 directory.
 
+.EXAMPLE
+Invoke-ChocolateyBoxstarter example -Password (ConvertTo-SecureString "mypassword" -asplaintext -force)
+
+This installs the example package and uses "mypassword" for any reboot 
+autologins. The user is now not prompted for a password.
+
 .LINK
 http://boxstarter.codeplex.com
 about_boxstarter_chocolatey
 about_boxstarter_variable_in_chocolatey
+Set-BoxstarterConfig
 #>    
     [CmdletBinding()]
     param(
-      [string]$bootstrapPackage="default",
-      [string]$localRepo,
-      [switch]$DisableReboots
+      [string]$BootstrapPackage=$null,
+      [string]$LocalRepo,
+      [switch]$DisableReboots,
+      [System.Security.SecureString]$Password,
+      [switch]$KeepWindowOpen
     )
-    if($DisableReboots){$Boxstarter.RebootOk=$false}
-    if(!$Boxstarter.ScriptToCall){
-        $script=@"
+    try{
+        if($DisableReboots){$Boxstarter.RebootOk=$false}
+        if($Boxstarter.ScriptToCall -eq $null){
+            if($bootstrapPackage -ne $null -and $bootstrapPackage.length -gt 0){
+                write-BoxstarterMessage "Installing package '$bootstrapPackage'" -Color Cyan
+            }
+            else{
+                write-BoxstarterMessage "Installing Chocolatey" -Color Cyan
+            }
+            $script=@"
 Import-Module (Join-Path "$($Boxstarter.baseDir)" BoxStarter.Chocolatey\Boxstarter.Chocolatey.psd1) -global -DisableNameChecking;
-Invoke-ChocolateyBoxstarter -bootstrapPackage $bootstrapPackage $(if($LocalRepo){"-Localrepo $localRepo"})
+Invoke-ChocolateyBoxstarter $(if($bootstrapPackage){"-bootstrapPackage $bootstrapPackage"}) $(if($LocalRepo){"-Localrepo $localRepo"})
 "@
-        Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk
-        return
+            Invoke-Boxstarter ([ScriptBlock]::Create($script)) -RebootOk:$Boxstarter.RebootOk -password $password -KeepWindowOpen:$KeepWindowOpen
+            return
+        }
+        if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
+        $Boxstarter.ProgramFiles86="$programFiles86"
+        $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
+        $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
+        Check-Chocolatey -ShouldIntercept
+        del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
+        if($bootstrapPackage -ne $null){
+            Download-Package $bootstrapPackage
+        }
     }
-    if(${env:ProgramFiles(x86)} -ne $null){ $programFiles86 = ${env:ProgramFiles(x86)} } else { $programFiles86 = $env:ProgramFiles }
-    $Boxstarter.ProgramFiles86="$programFiles86"
-    $Boxstarter.ChocolateyBin="$env:systemdrive\chocolatey\bin"
-    $Boxstarter.Package=$bootstrapPackage
-    $Boxstarter.LocalRepo=Resolve-LocalRepo $localRepo
-    Check-Chocolatey -ShouldIntercept
-    del "$env:ChocolateyInstall\ChocolateyInstall\ChocolateyInstall.log" -ErrorAction SilentlyContinue
-    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
-    Download-Package $bootstrapPackage
+    finally {
+        $Boxstarter.ScriptToCall = $null
+    }
 }
 
 function Resolve-LocalRepo([string]$localRepo) {
@@ -99,10 +125,12 @@ function Resolve-LocalRepo([string]$localRepo) {
 }
 
 function Download-Package([string]$bootstrapPackage) {
+    $Boxstarter.Package=$bootstrapPackage
+    del "$env:systemdrive\chocolatey\lib\$bootstrapPackage.*" -recurse -force -ErrorAction SilentlyContinue
     if(test-path (Join-Path $Boxstarter.LocalRepo "$bootstrapPackage.*.nupkg")){
         $source = $Boxstarter.LocalRepo
     } else {
-        $source = $Boxstarter.Config.NugetSources
+        $source = (Get-BoxstarterConfig).NugetSources
     }
     write-BoxstarterMessage "Installing $bootstrapPackage package from $source"
     Chocolatey install $bootstrapPackage -source $source -force

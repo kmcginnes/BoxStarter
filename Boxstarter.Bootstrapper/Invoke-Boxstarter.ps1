@@ -1,9 +1,3 @@
-if(!$Global:Boxstarter) { $Global:Boxstarter = @{} }
-$Boxstarter.Log="$env:temp\boxstarter.log"
-$Boxstarter.RebootOk=$false
-$Boxstarter.SuppressLogging=$false
-$Boxstarter.IsRebooting=$false
-
 function Invoke-BoxStarter{
 <#
 .SYNOPSIS
@@ -38,6 +32,11 @@ parameterBoxstarter will prompt the user to enter a password which
 will be used for automatic logins in the event a restart is 
 required.
 
+.PARAMETER NoNewWindow
+Enabling this switch will prevent the command window from closing and 
+prompt the user to pres the Enter key before the window closes. This 
+is ideal when not invoking boxstarter from a console.
+
 .EXAMPLE
 Invoke-Boxstarter {Import-Modler myinstaller;Invoke-MyInstall} -RebootOk
 
@@ -54,30 +53,41 @@ Invoke-Reboot
 #>    
     [CmdletBinding()]
     param(
+      [Parameter(Position=0,Mandatory=0)]
       [ScriptBlock]$ScriptToCall,
+      [Parameter(Position=1,Mandatory=0)]
       [System.Security.SecureString]$password,
-      [switch]$RebootOk
+      [Parameter(Position=2,Mandatory=0)]
+      [switch]$RebootOk,
+      [Parameter(Position=3,Mandatory=0)]
+      [string]$encryptedPassword=$null,
+      [Parameter(Position=4,Mandatory=0)]
+      [switch]$KeepWindowOpen      
     )
-    $scriptFile = "$env:temp\boxstarter.script"
+    $scriptFile = "$(Get-BoxstarterTempDir)\boxstarter.script"
     if(!(Test-Admin)) {
         New-Item $scriptFile -type file -value $ScriptToCall.ToString() -force | out-null
         Write-BoxstarterMessage "User is not running with administrative rights. Attempting to elevate..."
         $unNormalized=(Get-Item "$($Boxstarter.Basedir)\Boxstarter.Bootstrapper\BoxStarter.Bootstrapper.psd1")
-        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'})"
+        if($password){ 
+            $encryptedPass = convertfrom-securestring -securestring $password
+            $passwordArg = "-encryptedPassword $encryptedPass"
+        }
+        $command = "-ExecutionPolicy bypass -noexit -command Import-Module `"$($unNormalized.FullName)`";Invoke-BoxStarter $(if($RebootOk){'-RebootOk'}) $passwordArg"
         Start-Process powershell -verb runas -argumentlist $command
         return
     }
     $session=$null
     try{
         $boxMod=(IEX (Get-Content (join-path $Boxstarter.Basedir Boxstarter.Bootstrapper\Boxstarter.Bootstrapper.psd1) | Out-String))
-        write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo
-        write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com" -nologo
+        write-BoxstarterMessage "Boxstarter Version $($boxMod.ModuleVersion)" -nologo -Color White
+        write-BoxstarterMessage "$($boxMod.Copyright) http://boxstarter.codeplex.com`r`n" -nologo -Color White
         $session=Start-TimedSection "Installation session."
         if($RebootOk){$Boxstarter.RebootOk=$RebootOk}
+        if($encryptedPassword){$password = ConvertTo-SecureString -string $encryptedPassword}
         $script:BoxstarterPassword=InitAutologon $password
         $script:BoxstarterUser=$env:username
         $Boxstarter.ScriptToCall = Resolve-Script $ScriptToCall $scriptFile
-        if(Test-ReEnableUAC) {Enable-UAC}
         Stop-UpdateServices
         &([ScriptBlock]::Create($Boxstarter.ScriptToCall))
     }
@@ -86,7 +96,7 @@ Invoke-Reboot
        $_ | write-host -ForeGroundColor red
     }
     finally{
-        Cleanup-Boxstarter
+        Cleanup-Boxstarter -KeepWindowOpen:$KeepWindowOpen
         Stop-TimedSection $session
         if($BoxStarter.IsRebooting) {
             $BoxStarter.IsRebooting = $false #reset
@@ -128,7 +138,13 @@ function InitAutologon([System.Security.SecureString]$password){
     } else {$autoLogon=0}
     $Boxstarter.AutologedOn = ($autoLogon -gt 0)
     if($Boxstarter.RebootOk -and !$Password -and !$Boxstarter.AutologedOn) {
-        write-host "Boxstarter may need to reboot your system. Please provide your password so that Boxstarter may automatically log you on. Your password will be securely stored and encrypted."
+        Write-BoxstarterMessage "Please type CTRL+C or close this window to exit Boxstarter if you do not want to risk a reboot during this Boxstarter install.`r`n" -nologo -Color Yellow
+        write-BoxstarterMessage @"
+Boxstarter may need to reboot your system. 
+Please provide your password so that Boxstarter may automatically log you on. 
+Your password will be securely stored and encrypted.
+"@ -nologo
+
         $Password=Read-AuthenticatedPassword
     }
     return $password
@@ -143,10 +159,4 @@ function Resolve-Script([ScriptBlock]$script, [string]$scriptFile){
         }
     }
     throw "No Script was specified to call."
-}
-
-function Test-ReEnableUAC {
-    $test=Test-Path "$env:temp\BoxstarterReEnableUAC"
-    if($test){del "$env:temp\BoxstarterReEnableUAC"}
-    return $test
 }

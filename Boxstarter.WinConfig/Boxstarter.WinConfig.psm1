@@ -11,5 +11,6 @@ Export-ModuleMember Disable-UAC, `
                     Move-LibraryDirectory, `
                     Enable-RemoteDesktop, `
                     Set-ExplorerOptions, `
+                    Set-PowerPlan, `
                     Get-LibraryNames, `
                     Update-ExecutionPolicy
