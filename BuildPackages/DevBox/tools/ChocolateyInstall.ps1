@@ -19,8 +19,13 @@ try {
     Set-PowerPlan "High performance"
     Write-BoxstarterMessage "Setting Standby Timeout to Never"
     & powercfg.exe -change -standby-timeout-ac 0
+    & powercfg.exe -change -standby-timeout-dc 0
     Write-BoxstarterMessage "Setting Monitor Timeout to Never"
     & powercfg.exe -change -monitor-timeout-ac 0
+    & powercfg.exe -change -monitor-timeout-dc 0
+    Write-BoxstarterMessage "Setting Disk Timeout to Never"
+    & powercfg.exe -change -disk-timeout-ac 0
+    & powercfg.exe -change -disk-timeout-dc 0
     Write-BoxstarterMessage "Turning off Windows Hibernation"
     & powercfg.exe -h off
     Write-BoxstarterMessage "Setting time zone to Central Standard Time"
@@ -28,25 +33,20 @@ try {
     Write-BoxstarterMessage "Stopping touch keyboard service"
     & net stop TabletInputService # untested
 
-    cinstm 7zip
-    cinstm fiddler4
-    cinstm git-credential-winstore
-    cinstm githubforwindows
-    cinstm Console2
-    cinstm sublimetext2
-    cinstm SublimeText2.PackageControl
-    cinstm googlechrome
-    cinstm windirstat
-    cinstm SourceCodePro
-    cinstm PsGet
-    cinstm procmon
-    
-    cinstm wizmouse
+    cinst 7zip
+    cinst fiddler4
+    cinst githubforwindows
+    cinst Console2
+    cinst sublimetext2
+    cinst SublimeText2.PackageControl
+    cinst googlechrome
+    cinst SourceCodePro
+    cinst wizmouse
 
-    # cinst IIS-WebServerRole -source windowsfeatures
-    # cinst IIS-HttpCompressionDynamic -source windowsfeatures
-    # cinst IIS-ManagementScriptingTools -source windowsfeatures
-    # cinst IIS-WindowsAuthentication -source windowsfeatures
+    cinst IIS-WebServerRole -source windowsfeatures
+    cinst IIS-HttpCompressionDynamic -source windowsfeatures
+    cinst IIS-ManagementScriptingTools -source windowsfeatures
+    cinst IIS-WindowsAuthentication -source windowsfeatures
 
     $env:Path = "$env:Path;${env:ProgramFiles(x86)}\Git\cmd"
 
@@ -67,10 +67,8 @@ try {
     Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitignore_global') -Force -Recurse "$env:userprofile\.gitignore_global"
     Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitconfig') -Force -Recurse "$env:userprofile\.gitconfig"
 
-    Write-BoxstarterMessage "Installing PoshGit and PowerShell settings..."
+    Write-BoxstarterMessage "Installing PowerShell settings..."
     $documentsDir = [environment]::getfolderpath("mydocuments")
-    New-Item -ItemType Directory -Path "c:\tools\poshgit" -Force | Out-Null
-    & git clone "https://github.com/dahlbyk/posh-git.git" "c:\tools\poshgit"
     New-Item -ItemType Directory -Path "$documentsDir\WindowsPowerShell" -Force | Out-Null
     Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\Microsoft.PowerShell_profile.ps1') -Force -Recurse "$documentsDir\WindowsPowerShell"
 
@@ -79,6 +77,7 @@ try {
     Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\console.xml') -Force -Recurse "$console2Dir\bin"
 
     Write-BoxstarterMessage "Setting up pinned task bar items"
+    Install-ChocolateyPinnedTaskBarItem "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe"
     Install-ChocolateyPinnedTaskBarItem "$($Boxstarter.programFiles86)\Google\Chrome\Application\chrome.exe"
     Install-ChocolateyPinnedTaskBarItem "$console2Dir\bin\Console.exe"
     Install-ChocolateyPinnedTaskBarItem "$sublimeDir\sublime_text.exe"
@@ -88,12 +87,17 @@ try {
     Install-ChocolateyFileAssociation ".config" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".xml" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".ps1" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    Install-ChocolateyFileAssociation ".psm" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".cs" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".cshtml" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".csproj" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    Install-ChocolateyFileAssociation ".rb" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".js" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".css" "$env:programfiles\Sublime Text 2\sublime_text.exe"
     Install-ChocolateyFileAssociation ".less" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    Install-ChocolateyFileAssociation ".pl" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    Install-ChocolateyFileAssociation ".sh" "$env:programfiles\Sublime Text 2\sublime_text.exe"
+    Install-ChocolateyFileAssociation ".java" "$env:programfiles\Sublime Text 2\sublime_text.exe"
 
     Install-WindowsUpdate -AcceptEula
 

@@ -1,20 +1,22 @@
-﻿
-$PoshGitLocation = "C:\tools\poshgit"
-Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
+﻿Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
 
-# Load posh-git module from current directory
-$poshGitIsInstalled = Test-Path $PoshGitLocation
-if($poshGitIsInstalled -eq $true) {
-    Import-Module $PoshGitLocation\posh-git
-    Write-Host "PoshGit loaded" -ForegroundColor Green
+# Reclaim a ton of disk space from branches that have been built but aren't actively needed
+# It's hard-coded with my code folder and MYAPP:\ so I can call it from anywhere, but
+# it can be made more generic and simplified with James Tryand's walk function further down
+Function Clean-All
+{
+    pushd Z:\Projects\
+    Get-ChildItem -Directory | % {
+        pushd $_
+        Get-Item *.sln | % {
+            Write-Host ("    Cleaning {0}" -f $_.ToString().Replace("Z:\Projects\", "")) -F Yellow
+            &'msbuild' /t:Clean /nologo /v:m $_
+        }
+        popd
+    }
+    popd
+    Write-Host ""
 }
-else {
-    Write-Host "PoshGit not installed" -ForegroundColor Yellow
-}
-
-# If module is installed in a default location ($env:PSModulePath),
-# use this instead (see about_Modules for more information):
-# Import-Module posh-git
 
 #Set environment variables for Visual Studio Command Prompt
 $visualStudioPath = "${Env:ProgramFiles(x86)}\Microsoft Visual Studio 12.0\VC"
@@ -45,14 +47,14 @@ else {
 
 Set-Alias subl 'C:\Program Files\Sublime Text 2\sublime_text.exe'
 
+# Launch explorer in current folder
+Function e { ii . }
+# Launch VS for sln(s) in current folder
+Function VS { ii *.sln }
+
 # Set up a simple prompt, adding the git prompt parts inside git repos
 function prompt {
     $realLASTEXITCODE = $LASTEXITCODE
-
-    # Reset color, which can be messed up by Enable-GitColors
-    if($poshGitIsInstalled -eq $true) {
-        $Host.UI.RawUI.ForegroundColor = $GitPromptSettings.DefaultForegroundColor
-    }
     
     $newline = [Environment]::NewLine
 
@@ -61,21 +63,8 @@ function prompt {
 
     Write-Host($pwd) -nonewline -ForegroundColor Green
 
-
-    if($poshGitIsInstalled -eq $true) {
-        Write-VcsStatus
-    }
-
     $global:LASTEXITCODE = $realLASTEXITCODE
     return $newline + "--> "
 }
 
-if($poshGitIsInstalled -eq $true) {
-    Enable-GitColors
-}
-
 Pop-Location
-
-if($poshGitIsInstalled -eq $true) {
-    Start-SshAgent -Quiet
-}

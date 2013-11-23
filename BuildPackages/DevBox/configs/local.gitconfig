@@ -29,9 +29,13 @@
 	cw = commit -m "WIP"
 	cm = commit -m
 	cc = commit -c
+	cam = !git add -A && git commit -m
+	amend = commit --amend            # ammend your last commit
+  	ammend = commit --amend           # ammend your last commit
 	
 	# branch
 	b = branch
+	rename = branch -m
 	
 	# add
 	a = add
@@ -84,10 +88,12 @@
 	
 	# clean
 	prune = fetch --prune
+	cleanup = clean -f -x -d --dry-run
+	cleanupnow = clean -f -x -d
 
 	# tfs
-	tpush = tfs checkintool
-	tpull = tfs pull
+	tpush = tf checkin
+	tpull = tf pull --rebase
 
 	# misc
 	pi = cherry-pick
@@ -96,6 +102,7 @@
 	# experimental
 	unstage = reset HEAD
   	uncommit = reset --soft HEAD^
+  	undo = reset --hard HEAD
 	stage = add
 	pop = reset --soft HEAD^
 	review = log -p --max-count=1
