@@ -1,6 +1,7 @@
 try {
     Disable-UAC
     Update-ExecutionPolicy Unrestricted
+
     Set-ExplorerOptions -showHidenFilesFoldersDrives -showFileExtensions -bootToDesktop -hideTouchKeyboard
 
     Write-BoxstarterMessage "Turning off the lock screen"
@@ -15,10 +16,17 @@ try {
         Set-ItemProperty $key NoLockScreen 1 -Type DWord
     }
     
+    Set-PowerPlan "High performance"
+    Write-BoxstarterMessage "Setting Standby Timeout to Never"
+    & powercfg.exe -change -standby-timeout-ac 0
+    Write-BoxstarterMessage "Setting Monitor Timeout to Never"
+    & powercfg.exe -change -monitor-timeout-ac 0
     Write-BoxstarterMessage "Turning off Windows Hibernation"
     & powercfg.exe -h off
     Write-BoxstarterMessage "Setting time zone to Central Standard Time"
     & $env:windir\system32\tzutil /s "Central Standard Time"
+    Write-BoxstarterMessage "Stopping touch keyboard service"
+    & net stop TabletInputService # untested
 
     cinstm 7zip
     cinstm fiddler4
@@ -32,6 +40,7 @@ try {
     cinstm SourceCodePro
     cinstm PsGet
     cinstm procmon
+    cinstm wizmouse
 
     # cinst IIS-WebServerRole -source windowsfeatures
     # cinst IIS-HttpCompressionDynamic -source windowsfeatures
@@ -86,6 +95,9 @@ try {
     Install-ChocolateyFileAssociation ".less" "$env:programfiles\Sublime Text 2\sublime_text.exe"
 
     Install-WindowsUpdate -AcceptEula
+
+    # $password = Read-AuthenticatedPassword
+    # Set-SecureAutoLogon -Username $env:username -Password $password
 
     Write-ChocolateySuccess 'DevBox'
 } catch {
