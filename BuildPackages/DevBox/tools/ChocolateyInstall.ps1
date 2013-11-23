@@ -40,6 +40,7 @@ try {
     cinstm SourceCodePro
     cinstm PsGet
     cinstm procmon
+    
     cinstm wizmouse
 
     # cinst IIS-WebServerRole -source windowsfeatures
