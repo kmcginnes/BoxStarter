@@ -42,11 +42,15 @@ try {
     cinst googlechrome
     cinst SourceCodePro
     cinst wizmouse
+    cinst mactype
 
     cinst IIS-WebServerRole -source windowsfeatures
     cinst IIS-HttpCompressionDynamic -source windowsfeatures
     cinst IIS-ManagementScriptingTools -source windowsfeatures
     cinst IIS-WindowsAuthentication -source windowsfeatures
+
+    CasPol.exe -pp off -m -ag 1.2 -url file://\\vmware-host/* FullTrust
+    copy config\security.config config\security.config.default
 
     $env:Path = "$env:Path;${env:ProgramFiles(x86)}\Git\cmd"
 
