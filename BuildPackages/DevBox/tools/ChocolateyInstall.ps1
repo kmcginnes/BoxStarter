@@ -49,8 +49,10 @@ try {
     cinst IIS-ManagementScriptingTools -source windowsfeatures
     cinst IIS-WindowsAuthentication -source windowsfeatures
 
-    CasPol.exe -pp off -m -ag 1.2 -url file://\\vmware-host/* FullTrust
-    copy config\security.config config\security.config.default
+    C:\Windows\Microsoft.Net\Framework64\v2.0.50727\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
+    C:\Windows\Microsoft.Net\Framework64\v4.0.30319\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
+    C:\Windows\Microsoft.Net\Framework\v2.0.50727\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
+    C:\Windows\Microsoft.Net\Framework\v4.0.30319\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
 
     $env:Path = "$env:Path;${env:ProgramFiles(x86)}\Git\cmd"
 
