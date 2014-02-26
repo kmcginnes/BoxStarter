@@ -15,6 +15,8 @@ try {
     {
         Set-ItemProperty $key NoLockScreen 1 -Type DWord
     }
+    $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+    Set-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' EnableLinkedConnections 1 -Type DWord
     
     Set-PowerPlan "High performance"
     Write-BoxstarterMessage "Setting Standby Timeout to Never"
@@ -72,6 +74,7 @@ try {
     Write-BoxstarterMessage "Copying personal global gitignore and gitconfig"
     Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitignore_global') -Force -Recurse "$env:userprofile\.gitignore_global"
     Copy-Item (Join-Path (Get-PackageRoot($MyInvocation)) 'configs\local.gitconfig') -Force -Recurse "$env:userprofile\.gitconfig"
+    git config --global core.fileMode false
 
     Write-BoxstarterMessage "Installing PowerShell settings..."
     $documentsDir = [environment]::getfolderpath("mydocuments")
