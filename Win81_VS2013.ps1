@@ -56,6 +56,8 @@ cinst autoit #required by freefilesync
 cinst freefilesync
 
 hst add buildserver1 10.1.12.110
+
+Install-ChocolateyVsixPackage "HideMainMenu" http://visualstudiogallery.msdn.microsoft.com/bdbcffca-32a6-4034-8e89-c31b86ad4813/file/18183/2/HideMenu.vsix
  
 # This should be a search for CasPol.exe and then loop over all results
 & C:\Windows\Microsoft.Net\Framework64\v4.0.30319\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
