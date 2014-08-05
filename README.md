@@ -8,7 +8,7 @@ New VM initialization scripts based on BoxStarter, Chocolatey, and PowerShell
 Open a command prompt or run window and paste the following:
 
 ```
-START http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/kmcginnes/BoxStarter/master/Win81_VS2013.txt
+START http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/kmcginnes/BoxStarter/master/Win81_VS2013.ps1
 ```
 
 ## What does it install
