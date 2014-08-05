@@ -47,12 +47,15 @@ cinst msbuild.communitytasks
 cinst wpfinspector
 cinst console2
 cinst wincommandpaste
-cinst Office365HomePremium
+# cinst Office365HomePremium
+cinst hst
 
 # Memory disk apps
 cinst imdisk
 cinst autoit #required by freefilesync
 cinst freefilesync
+
+hst add buildserver1 10.1.12.110
  
 # This should be a search for CasPol.exe and then loop over all results
 & C:\Windows\Microsoft.Net\Framework64\v4.0.30319\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
