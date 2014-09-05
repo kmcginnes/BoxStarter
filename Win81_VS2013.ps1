@@ -37,29 +37,35 @@ cinst googlechrome
 cinst SourceCodePro
 cinst wizmouse
 cinst githubforwindows
-# cinst VisualStudio2013Ultimate -InstallArguments "/Features:'Blend WebTools Win8SDK SQL WindowsPhone80 SilverLight_Developer_Kit'"
-# cinst VSColorOutput
-# cinst resharper
-# cinst ncrunch2.vs2013
-# cinst editorconfig.vs
 cinst NuGet.CommandLine
 cinst msbuild.communitytasks
 cinst wpfinspector
 cinst console2
 cinst wincommandpaste
 # cinst Office365HomePremium
+
 cinst hst
-
-# Memory disk apps
-cinst imdisk
-cinst autoit #required by freefilesync
-cinst freefilesync
-
 hst add buildserver1 10.1.12.110
 
-Install-ChocolateyVsixPackage "HideMainMenu" http://visualstudiogallery.msdn.microsoft.com/bdbcffca-32a6-4034-8e89-c31b86ad4813/file/18183/2/HideMenu.vsix
-Install-ChocolateyVsixPackage "SqlCeToolbox" http://visualstudiogallery.msdn.microsoft.com/0e313dfd-be80-4afb-b5e9-6e74d369f7a1/file/29445/68/SqlCeToolbox.vsix
+# Memory disk apps
+
+cinst imdisk
+
+# freefilesync install is not working right now
+# cinst autoit #required by freefilesync
+# cinst freefilesync 
  
 # This should be a search for CasPol.exe and then loop over all results
 & C:\Windows\Microsoft.Net\Framework64\v4.0.30319\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
 & C:\Windows\Microsoft.Net\Framework\v4.0.30319\CasPol.exe -pp off -m -ag 1.2 -url file:///Z:/Projects/* FullTrust
+
+
+# Visual Studio 2013
+
+cinst VisualStudio2013Ultimate -InstallArguments "/Features:'Blend WebTools Win8SDK SQL WindowsPhone80 SilverLight_Developer_Kit'"
+cinst VSColorOutput
+cinst resharper
+cinst ncrunch2.vs2013
+cinst editorconfig.vs
+Install-ChocolateyVsixPackage "HideMainMenu" http://visualstudiogallery.msdn.microsoft.com/bdbcffca-32a6-4034-8e89-c31b86ad4813/file/18183/2/HideMenu.vsix
+Install-ChocolateyVsixPackage "SqlCeToolbox" http://visualstudiogallery.msdn.microsoft.com/0e313dfd-be80-4afb-b5e9-6e74d369f7a1/file/29445/68/SqlCeToolbox.vsix
