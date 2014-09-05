@@ -37,11 +37,11 @@ cinst googlechrome
 cinst SourceCodePro
 cinst wizmouse
 cinst githubforwindows
-cinst VisualStudio2013Ultimate -InstallArguments "/Features:'Blend WebTools Win8SDK SQL WindowsPhone80 SilverLight_Developer_Kit'"
-cinst VSColorOutput
-cinst resharper
-cinst ncrunch2.vs2013
-cinst editorconfig.vs
+# cinst VisualStudio2013Ultimate -InstallArguments "/Features:'Blend WebTools Win8SDK SQL WindowsPhone80 SilverLight_Developer_Kit'"
+# cinst VSColorOutput
+# cinst resharper
+# cinst ncrunch2.vs2013
+# cinst editorconfig.vs
 cinst NuGet.CommandLine
 cinst msbuild.communitytasks
 cinst wpfinspector
