@@ -42,14 +42,17 @@ cinst msbuild.communitytasks
 cinst wpfinspector
 cinst console2
 cinst wincommandpaste
+cinst nodejs.install
+npm install -g grunt-cli
 # cinst Office365HomePremium
 
 cinst hst
 hst add buildserver1 10.1.12.110
+hst add phoenix.watchguardvideo.local 10.1.0.12
 
 # Memory disk apps
 
-cinst imdisk
+# cinst imdisk
 
 # freefilesync install is not working right now
 # cinst autoit #required by freefilesync
